@@ -6,6 +6,8 @@ const banner = document.querySelector('.app__image');
 const titulo = document.querySelector('.app__title');
 const botoes = document.querySelectorAll('.app__card-button');
 const startPauseBt = document.querySelector('#start-pause');
+const iniciarOuPausarBt = document.querySelector('#start-pause span');
+const tempoNaTela = document.querySelector('#timer');
 
 const musicaFocoInput = document.querySelector('#alternar-musica');
 const musica = new Audio('/sons/luna-rise-part-one.mp3');
@@ -13,7 +15,7 @@ const somPlay = new Audio('/sons/play.wav');
 const somPause = new Audio('/sons/pause.mp3');
 const somBeep = new Audio('/sons/beep.mp3');
 
-let tempoDecorridoEmSegundos = 5;
+let tempoDecorridoEmSegundos = 1500;
 let intervaloId = null;
 
 musica.loop = true;
@@ -29,19 +31,23 @@ musicaFocoInput.addEventListener('change', () => {
 focoBt.addEventListener('click', () => {
     alterarContexto('foco');
     focoBt.classList.add('active');
+    tempoDecorridoEmSegundos = 1500;
 })
 
 curtoBt.addEventListener('click', () => {
     alterarContexto('descanso-curto');
     curtoBt.classList.add('active');
+    tempoDecorridoEmSegundos = 300;
 })
 
 longoBt.addEventListener('click', () => {
     alterarContexto('descanso-longo');
     longoBt.classList.add('active');
+    tempoDecorridoEmSegundos = 900;
 })
 
 function alterarContexto(contexto){
+    mostrarTempo();
     botoes.forEach(function (contexto){
         contexto.classList.remove('active');
     })
@@ -65,28 +71,38 @@ function alterarContexto(contexto){
 
 const contagemRegressiva = () => {
     if(tempoDecorridoEmSegundos <= 0){
-        zerar();
-        alert('Tempo finalizado!');
         somBeep.play();
+        alert('Tempo finalizado!');
+        zerar();
         return;
     }
     tempoDecorridoEmSegundos -= 1;
-    console.log(`Temporizador: ` + tempoDecorridoEmSegundos);
+    mostrarTempo();
 }
 
 startPauseBt.addEventListener('click', iniciarOuPausar);
 
 function iniciarOuPausar(){
     if(intervaloId){
+        somPause.play();
         zerar();
         return;
     }
     somPlay.play();
     intervaloId = setInterval(contagemRegressiva, 1000);
+    iniciarOuPausarBt.textContent = "Pausar";
 }
 
 function zerar(){
     clearInterval(intervaloId);
     intervaloId = null;
-    somPause.play();
+    iniciarOuPausarBt.textContent = "Começar";
 }
+
+function mostrarTempo(){
+    const tempo = new Date(tempoDecorridoEmSegundos * 1000);
+    const tempoFormatado = tempo.toLocaleTimeString('pt-br', {minute: '2-digit', second: '2-digit'});
+    tempoNaTela.innerHTML = `${tempoFormatado}`
+}
+
+mostrarTempo();
