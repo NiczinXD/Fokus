@@ -31,7 +31,7 @@ musicaFocoInput.addEventListener('change', () => {
 focoBt.addEventListener('click', () => {
     alterarContexto('foco');
     focoBt.classList.add('active');
-    tempoDecorridoEmSegundos = 1500;
+    tempoDecorridoEmSegundos = 30;//1500;
 })
 
 curtoBt.addEventListener('click', () => {
@@ -73,6 +73,11 @@ const contagemRegressiva = () => {
     if(tempoDecorridoEmSegundos <= 0){
         somBeep.play();
         alert('Tempo finalizado!');
+        const focoAtivo = html.getAttribute('data-contexto') == 'foco';
+        if(focoAtivo){
+            const evento = new CustomEvent('FocoFinalizado');
+            document.dispatchEvent(evento);
+        }
         zerar();
         return;
     }
